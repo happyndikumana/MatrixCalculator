@@ -1,9 +1,8 @@
- /*
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-// package matricecalculator;
 
 import java.util.Scanner;
 import java.util.Arrays;
@@ -42,6 +41,7 @@ public class MatriceCalculator {
                 dimension = inputUser.nextInt();
 
                 matriceNumbers = new double[dimension][dimension];
+                System.out.println("Enter your 1st Matrice: ");
                 matriceNumbers = numberInsertion( matriceNumbers, inputUser ); //called method for entering numbers
                 
                 System.out.println("this is the first matrice you entered");
@@ -118,13 +118,30 @@ public class MatriceCalculator {
                 matriceNumbers = new double[dimension][dimension];
                 matriceNumbers = numberInsertion( matriceNumbers, inputUser ); //called method for entering numbers
                 
-                minors ( matriceNumbers );
-                //Permutated( matriceNumbers );
-//                determinant = determinant( matriceNumbers, dimension );
-//                if ( determinant == 0 ){
-//                    System.out.println("Your matrix has no inverse. Its determinant = "+determinant);
-//                }
-//                System.out.println("Determinant = "+determinant);
+                System.out.println("You entered");
+                matricePrint ( matriceNumbers );
+                double[][] inverseMatrice = inverse ( matriceNumbers );
+                boolean choice = true;
+                loop1:
+                for ( int i = 0; i < inverseMatrice.length;i++ ){
+                    for ( int j = 0; j < inverseMatrice.length;j++ ){
+                        if ( inverseMatrice[i][j] == 0 ){
+                            choice = false;
+                        }
+                        else {
+                            choice = true;
+                            break loop1;
+                        }
+                    }
+                        
+                }
+                if ( choice ){
+                System.out.println("\nThe inverse is: ");
+                matricePrint( inverseMatrice );
+                }
+                else{
+                    System.out.println("The matrice has no inverse");
+                }
                 break;
             }
             case 6: //Transpose
@@ -139,11 +156,33 @@ public class MatriceCalculator {
                 matricePrint( matriceNumbers ); //called method for printing matrices
                 
                 System.out.println("");
-                Transposed( matriceNumbers );
+                transposed( matriceNumbers );
                 System.out.println("your Transposed matrix is: \n");
                 matricePrint( matriceNumbers );
                 
                 break;
+            }
+            case 7:
+            {
+                System.out.println("What are the dimensions of your matrice?: (enter an integer)");
+                dimension = inputUser.nextInt();
+
+                matriceNumbers = new double[dimension][dimension];
+                matriceNumbers = numberInsertion( matriceNumbers, inputUser );
+                
+                System.out.println("this is the matrice you entered");
+                matricePrint( matriceNumbers ); //called method for printing matrices
+                
+                double temp = determinant ( matriceNumbers );
+                System.out.println("Determinant = "+temp);
+                
+//                matriceNumbers = rowSwitch ( matriceNumbers );
+//                System.out.println("Row is switched: ");
+//                matricePrint ( matriceNumbers );
+//                
+//                matriceNumbers = columnSwitch ( matriceNumbers );
+//                System.out.println("Column is switched: ");
+//                matricePrint ( matriceNumbers );
             }
         }
        
@@ -185,102 +224,26 @@ public class MatriceCalculator {
             }
         return matriceNumbers;
     }
-    public static double[][] Transposed( double[][] matriceNumbers ){
+    public static double[][] transposed( double[][] matriceNumbers ){
         
-        double temp;
-        for ( int i = 0; i < matriceNumbers.length; i++ )
-            for ( int j = 0; j < matriceNumbers[i].length; j++ )
+        int rows = matriceNumbers[0].length;
+        int columns = matriceNumbers.length;
+        double[][] tempMatrice = new double[matriceNumbers.length][matriceNumbers[0].length];
+        
+        for ( int f = 0; f<tempMatrice.length;f++ )
+            for ( int h = 0;h<tempMatrice[f].length;h++ )
+                tempMatrice[f][h] = matriceNumbers[f][h];
+        
+        for ( int i = 0; i < rows; i++ )
+            for ( int j = 0; j < columns; j++ )
             {
-               temp =  matriceNumbers[i][j];
-               matriceNumbers[i][j] = matriceNumbers[j][i];
-               matriceNumbers[j][i] = temp;
+               //temp =  matriceNumbers[i][j];
+               matriceNumbers[i][j] = tempMatrice[j][i];
+               //matriceNumbers[j][i] = temp;
             }
         return matriceNumbers;
     }
-    public static double determinant( double[][] matriceNumbers,int dimension ){
-    
-        double determinant;
-        //Putting matrice into a temporary mtrice and then adding the first two colums at the end
-        if ( matriceNumbers.length == 2 )
-        {
-            //matricePrint( matriceNumbers );
-            double productRight = matriceNumbers[0][0]*matriceNumbers[1][1];
-            double productLeft =  matriceNumbers[0][1]*matriceNumbers[1][0];
-            determinant = productRight - productLeft;
-            return determinant;
-        }
-        else{
-            double[][] tempMatriceNumbers = new double[dimension][dimension+2];
-            String[][] stringTempMatriceNumbers = new String[dimension][dimension+2];
-
-            for ( int x = 0; x < matriceNumbers.length; x++ )
-                for ( int h = 0; h < matriceNumbers[x].length; h++ )
-                    tempMatriceNumbers[x][h] = matriceNumbers[x][h];
-
-            for ( int k = 0; k < tempMatriceNumbers.length; k++ )
-                for ( int n = 0; n <(tempMatriceNumbers[k].length - dimension); n++ )
-                    tempMatriceNumbers[k][dimension+n] = matriceNumbers[k][n];
-
-            //matricePrint( tempMatriceNumbers );
-
-            //Calculating the diagonal sums towards the right
-
-            double productRight = 1;
-            double sumRight = 0;
-
-           boolean decider = true;
-           int j = 0;
-           int i = 0;
-           int c = 1;
-           while ( decider ){
-               productRight = tempMatriceNumbers[i][j]*productRight;
-               i++; 
-               j++;
-               if ( i == (tempMatriceNumbers.length ) ){
-                   i = 0; j = i+c;
-                   c++;
-                   sumRight = productRight + sumRight;
-                   productRight = 1;
-                   if(j == 3){
-                       break;
-                   }
-               }
-           }
-           // System.out.println("Sum from right: "+sumRight);
-
-            //calculating the diagonal sums towards the left
-
-            double productLeft = 1;
-            double sumLeft = 0;
-
-            int d = 0;
-            int initial = tempMatriceNumbers[0].length - 1;
-            int y = initial;
-            int s = -1;
-
-            while ( decider ){
-               productLeft = tempMatriceNumbers[d][y]*productLeft;
-               d++; 
-               y--;
-               if ( d == (tempMatriceNumbers.length ) ){
-                   d = 0; y = initial+s;
-                   s--;
-                   sumLeft = productLeft + sumLeft;
-                   productLeft = 1;
-                   if(y == (initial - 3)){
-                       break;
-                   }
-               }
-           }
-            //System.out.println("Sum from Left: "+sumLeft);
-
-            determinant = sumRight - sumLeft;
-
-
-            return determinant;
-        }
-    }
-    public static double[][] Permutated( double[][] matriceNumbers ){
+    public static double[][] permutated( double[][] matriceNumbers ){
         
         for ( int i = 0; i < matriceNumbers.length; i++  )
             for ( int j = 0; j < matriceNumbers[i].length; j++ )
@@ -295,84 +258,84 @@ public class MatriceCalculator {
             };
         return matriceNumbers;
     } 
-    public static void minors(double[][] matriceNumbers){
+    public static double[][] cofactors(double[][] matrice){
+        int dimension = matrice.length;
+        double[][] cofactorMatrice = new double[dimension][dimension];
+        double[][] minorMatrice = new double[dimension - 1][dimension - 1];
         
-//        double[][] tempMatriceNumbers = new double[matriceNumbers.length][matriceNumbers.length];
-//        for ( int i = 0; i<tempMatriceNumbers.length; i++ )
-//            for ( int j = 0; j<tempMatriceNumbers[i].length; j++ ){
-//                tempMatriceNumbers[i][j] = matriceNumbers[i][j];
-//            }
-//        double temp;
-//        int dimension;
-//        for ( int m = 0; m<tempMatriceNumbers.length; m++ )
-//            for ( int z = 0; z<tempMatriceNumbers[m].length; z++ ){
-//                
-//                for ( int k = 1; k<tempMatriceNumbers.length; k++ ){
-//                    double[][] inLoopMatrice = new double[tempMatriceNumbers.length - 1][tempMatriceNumbers.length - 1];
-//                    dimension = inLoopMatrice.length;
-//                    if ( ((tempMatriceNumbers.length - 1)> 3) ){
-//                        minors( inLoopMatrice );
-//                    }
-//                    else
-//                    {
-//                        temp = determinant ( inLoopMatrice, dimension );
-//                    }
-//        }
-//            
-//        }
-
-        matricePrint ( matriceNumbers );
-        
-        int dimension = matriceNumbers.length;
-        int bigMatriceDimension = matriceNumbers.length + (matriceNumbers.length - 1);  
-        double [][] bigMatriceNumbers = new double [bigMatriceDimension][bigMatriceDimension];
-          
-        //making matrice into a bigger matrice so I can easily find the minors' determinant easily.
-        for ( int x = 0; x < matriceNumbers.length; x++ )
-            for ( int h = 0; h < matriceNumbers[x].length; h++ )
-                bigMatriceNumbers[x][h] = matriceNumbers[x][h];
-
-        for ( int k = 0; k < bigMatriceNumbers.length - (bigMatriceNumbers.length - dimension); k++ )
-            for ( int n = 0; n <(bigMatriceNumbers[k].length - dimension); n++ )
-                bigMatriceNumbers[k][dimension+n] = matriceNumbers[k][n];
-        
-        for ( int f = 0; f < (bigMatriceNumbers.length - dimension); f++ )
-            for ( int g = 0; g < bigMatriceNumbers[f].length; g++ )
-                bigMatriceNumbers[dimension+f][g] = bigMatriceNumbers[f][g];
-        
-        matricePrint ( bigMatriceNumbers );
-        
-        //getting minors of the matrice
-        
-        double[][] determinantMatrice = new double[matriceNumbers.length][matriceNumbers.length];
-        double[][] minorMatrice;
-        int minorDimension = determinantMatrice.length - 1;
-        double tempDeterminant;
-        
-        for ( int m = 0; m < determinantMatrice.length; m++ ){
-            for ( int z = 0; z < determinantMatrice[m].length; z++ ){
-                minorMatrice = new double[minorDimension][minorDimension];
-                System.out.println("Minor Matrice at"+m+""+z+" = "+bigMatriceNumbers[m][z]);
-                for ( int outside = 0; outside < minorMatrice.length; outside++ )
-                    for ( int inside = 0; inside < minorMatrice[outside].length; inside++ ){
-                        minorMatrice[outside][inside] = bigMatriceNumbers[m+1][z+1]; 
-                        //find a way to make the outside loops work with the inside loops
-                        
-                        //System.out.println("Minor Matrice at"+outside+""+inside+" = "+minorMatrice[outside][inside]);
-                    }
-                matricePrint ( minorMatrice );
-                System.out.println("");
-                if ( minorMatrice.length > 3 ){
-                    minors ( minorMatrice );
-                }
-                tempDeterminant = determinant ( minorMatrice, minorDimension );
-                determinantMatrice[m][z] = tempDeterminant;
+        for ( int i = 0; i < dimension;i++ ){
+            for ( int j = 0; j < dimension;j++ ){
+                minorMatrice = minor( matrice,i,j );
+                cofactorMatrice[i][j] = determinant(minorMatrice);
             }
         }
+        //System.out.println("cofactor matrice = ");
+        //matricePrint(cofactorMatrice);
+        return cofactorMatrice;
+    }
+    public static double determinant(double[][] matrice){
+        double det = 0;
+        int permutation = 1;
+        if ( matrice.length == 1 ){
+            return matrice[0][0];
+        }
+        double[][] minorMatrice = new double[matrice.length - 1][matrice.length - 1];
+        for ( int j = 0; j < matrice.length; j++ ){
+            minorMatrice = minor( matrice, 0, j );
+            det = det + (permutation * matrice[0][j] * determinant( minorMatrice ));
+            permutation = - permutation;
+        }
         
-        //matricePrint ( determinantMatrice );
+        return det;
+    }
+    public static double[][] minor(double[][] matrice, int row, int column){
+        double[][] minorMatrice = new double[matrice.length - 1][matrice.length - 1];
+        int d = 0, s = 0;
+        for ( int k = 0; k < matrice.length;k++ ){
+            for ( int h = 0; h < matrice.length;h++ ){
+                if (k != row && h != column){
+                    minorMatrice[d][s] = matrice[k][h];
+                    s++;
+                    if ( s == minorMatrice.length ){
+                        s = 0;
+                        d++;
+                    }
+                }
+            }
+        }
+        return minorMatrice;
+    }
+    public static double[][] adjoint(double[][] matrice){
+        double[][] adjointMatrice = new double[matrice.length][matrice.length];
+        double[][] cofactorMatrice = new double[matrice.length][matrice.length];
         
+        cofactorMatrice = cofactors(matrice);
+        adjointMatrice = permutated (cofactorMatrice);
+        adjointMatrice = transposed (adjointMatrice);
         
-        
+        return adjointMatrice;
+    }
+    public static double[][] inverse(double[][] matrice){
+        double[][] inverseMatrice = new double[matrice.length][matrice.length];
+        double determinantOfMatrice = determinant (matrice);
+        double[][] adjointOfMatrice = adjoint(matrice);
+
+        if ( determinantOfMatrice  == 0 ){
+            //System.out.println("Your matrice has no inverse");
+            return inverseMatrice;
+        }
+        else {
+            for ( int i = 0;i < matrice.length;i++ ){
+                for ( int j = 0; j < matrice.length;j++ ){
+                    inverseMatrice[i][j] = (1/determinantOfMatrice) * adjointOfMatrice[i][j];
+                    if ( inverseMatrice[i][j] == - 0 ){
+                        inverseMatrice[i][j] = - inverseMatrice[i][j];
+                    }
+                }
+            }
+            //System.out.println("The inverse is :");
+            //matricePrint ( inverseMatrice );
+            return inverseMatrice;
+        }    
     }
 }
