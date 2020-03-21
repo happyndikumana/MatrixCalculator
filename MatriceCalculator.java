@@ -92,12 +92,41 @@ public class MatriceCalculator {
             }
             case 3: //multiplication
             {
-                System.out.println("Number of Colums: (enter an integer)");
-                numberColumns = inputUser.nextInt();
-                System.out.println("Number of rows: (enter an integer)");
-                numberRows = inputUser.nextInt();
+                int rows1, rows2, column1, column2;
+                double[][] SecondMatrice;
+                double[][] FirstMatrice;
+                System.out.println("For your first matrice");
+                System.out.println("Enter the number of rows: ");
+                rows1 = inputUser.nextInt();
+                System.out.println("Enter the number of columns: ");
+                column1 = inputUser.nextInt();
+                //numberColumns = inputUser.nextInt();
+                System.out.println("For your second matrice");
+                System.out.println("Enter the number of rows: ");
+                rows2 = inputUser.nextInt();
+                System.out.println("Enter the number of columns: ");
+                column2 = inputUser.nextInt();
+                if ( column1 != rows2 ){
+                    System.out.println("matrices with these dimesions can not be multiplied");
+                }
+                else{
+                    SecondMatrice = new double[rows2][column2];
+                    FirstMatrice = new double[rows1][column1];
+                    double[][] multiplicationOfMatrice = new double[rows1][column2];
 
-                matriceNumbers = new double[numberRows][numberColumns];
+                    System.out.println("Enter first matrice:");
+                    FirstMatrice = numberInsertion( FirstMatrice, inputUser );
+                    System.out.println("Enter Second matrice:");
+                    SecondMatrice = numberInsertion( SecondMatrice, inputUser );
+                    multiplicationOfMatrice = multiplication(FirstMatrice, SecondMatrice);
+                    System.out.println(" The product: ");
+                    matricePrint( multiplicationOfMatrice );
+
+                }
+                //System.out.println("Number of rows: (enter an integer)");
+                //numberRows = inputUser.nextInt();
+
+                //matriceNumbers = new double[numberRows][numberColumns];
                 break;
             }
             case 4: //dot product
@@ -224,6 +253,38 @@ public class MatriceCalculator {
             }
         return matriceNumbers;
     }
+    public static double[][] multiplication(double[][] matriceOne, double[][] matriceTwo){
+        int rows = matriceOne.length, columns = matriceTwo[0].length;
+        double[][] multipliedMatrice = new double [rows][columns];
+        double[] temp = new double[matriceTwo.length];
+        for ( int i = 0; i < multipliedMatrice.length;i++ ){
+            for ( int j = 0; j < multipliedMatrice[i].length;j++ ){
+                temp = horiToVert ( matriceTwo, j );
+                multipliedMatrice[i][j] = times( matriceOne[i],temp );
+            }
+        }
+
+        return multipliedMatrice;
+    }
+    public static double[] horiToVert( double[][] matrice, int j){
+        double[] temp = new double[matrice.length];
+        for (int i = 0; i < matrice.length; i++){
+            for ( int k = 0; k < matrice[0].length; k++ ){
+                if ( k == j ){
+                    temp[i] = matrice[i][k];
+                }
+            }
+        }
+        return temp;
+    }
+    public static double times(double[] a,double[] b){
+        double sum = 0;
+        for ( int i = 0; i < a.length; i++ ){
+            sum = sum + (a[i] * b[i]);
+        }
+        return sum;
+    }
+
     public static double[][] transposed( double[][] matriceNumbers ){
         
         int rows = matriceNumbers[0].length;
