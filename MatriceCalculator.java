@@ -25,8 +25,8 @@ public class MatriceCalculator {
         
         
         System.out.println("Calculation options");
-        System.out.println("1: Addition \n2: Substraction\n3: Multiplication\n4: Dot Product\n"
-                + "5: Inverse\n6: Transpose");
+        System.out.println("1: Addition \n2: Substraction\n3: Multiplication\n4: Division\n"
+                + "5: Inverse\n6: Transpose"); //7: Determinant\8: Adjoint
         System.out.println("Enter one of the options here. (enter an integer):");
         
         userOption = inputUser.nextInt();
@@ -129,14 +129,45 @@ public class MatriceCalculator {
                 //matriceNumbers = new double[numberRows][numberColumns];
                 break;
             }
-            case 4: //dot product
+            case 4: //division
             {
-                System.out.println("Number of Colums: (enter an integer)");
-                numberColumns = inputUser.nextInt();
-                System.out.println("Number of rows: (enter an integer)");
-                numberRows = inputUser.nextInt();
+                System.out.println("Both of your matrices must be square matrices and have the same dimensions");
+                System.out.println("Enter matrices' dimensions");
+                dimension = inputUser.nextInt();
 
-                matriceNumbers = new double[numberRows][numberColumns];
+                double[][] matriceOne = new double[dimension][dimension];
+                double[][] matriceTwo = new double[dimension][dimension];
+                System.out.println("Enter your first matrice");
+                matriceOne = numberInsertion(matriceOne, inputUser);
+                System.out.println("You entered:");
+                matricePrint(matriceOne);
+                System.out.println("Enter your Second matrice");
+                matriceTwo = numberInsertion(matriceTwo, inputUser);
+                System.out.println("You entered:");
+                matricePrint(matriceTwo);
+                matriceOne = division (matriceOne,matriceTwo);
+
+                boolean choice = true;
+                loop1:
+                for ( int i = 0; i < matriceOne.length;i++ ){
+                    for ( int j = 0; j < matriceOne.length;j++ ){
+                        if ( matriceOne[i][j] == 0 ){
+                            choice = false;
+                        }
+                        else {
+                            choice = true;
+                            break loop1;
+                        }
+                    }     
+                }
+                if ( choice ){
+                    System.out.println("\nThe Quotient is: ");
+                    matricePrint( matriceOne );
+                }
+                else{
+                    System.out.println("The matrice has no Quotient");
+                }
+
                 break;
             }
             case 5: //Inverse
@@ -161,8 +192,7 @@ public class MatriceCalculator {
                             choice = true;
                             break loop1;
                         }
-                    }
-                        
+                    }     
                 }
                 if ( choice ){
                 System.out.println("\nThe inverse is: ");
@@ -191,7 +221,7 @@ public class MatriceCalculator {
                 
                 break;
             }
-            case 7:
+            case 7: //Determinant
             {
                 System.out.println("What are the dimensions of your matrice?: (enter an integer)");
                 dimension = inputUser.nextInt();
@@ -212,6 +242,10 @@ public class MatriceCalculator {
 //                matriceNumbers = columnSwitch ( matriceNumbers );
 //                System.out.println("Column is switched: ");
 //                matricePrint ( matriceNumbers );
+            }
+            case 8: //Adjoint
+            {
+
             }
         }
        
@@ -265,6 +299,13 @@ public class MatriceCalculator {
         }
 
         return multipliedMatrice;
+    }
+    public static double[][] division ( double[][]m1,double[][]m2 ){
+        double[][] divided = new double[m1.length][m1.length];
+        m2 = inverse(m2);
+        divided = multiplication(m1, m2);
+
+        return divided;
     }
     public static double[] horiToVert( double[][] matrice, int j){
         double[] temp = new double[matrice.length];
